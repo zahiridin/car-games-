@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2D Racing Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .road {
+      position: relative;
+      width: 300px;
+      height: 100vh;
+      background: linear-gradient(gray, black);
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .car {
+      position: absolute;
+      width: 50px;
+      height: 100px;
+      background: red;
+      border-radius: 5px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+      bottom: 20px;
+      left: 125px;
+    }
+
+    .obstacle {
+      position: absolute;
+      width: 50px;
+      height: 100px;
+      background: white;
+      top: -100px;
+      border-radius: 5px;
+    }
+
+    .score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .controls button {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .road {
+        width: 100%;
+      }
+      .car {
+        width: 30px;
+        height: 60px;
+      }
+      .obstacle {
+        width: 30px;
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="road">
+    <div class="score">Score: 0</div>
+    <div class="car"></div>
+  </div>
+  <div class="controls">
+    <button id="left">⬅️</button>
+    <button id="right">➡️</button>
+  </div>
+  <script>
+    const road = document.querySelector('.road');
+    const car = document.querySelector('.car');
+    const scoreElement = document.querySelector('.score');
+    const leftButton = document.getElementById('left');
+    const rightButton = document.getElementById('right');
+
+    let carPositionX = 125;
+    let score = 0;
+
+    // Машина ҳаракатланиши
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft' && carPositionX > 25) {
+        carPositionX -= 100;
+        car.style.left = carPositionX + 'px';
+      } else if (event.key === 'ArrowRight' && carPositionX < 225) {
+        carPositionX += 100;
+        car.style.left = carPositionX + 'px';
+      }
+    });
+
+    // Сенсор тугмаларни қўллаш
+    leftButton.addEventListener('click', () => {
+      if (carPositionX > 25) {
+        carPositionX -= 100;
+        car.style.left = carPositionX + 'px';
+      }
+    });
+
+    rightButton.addEventListener('click', () => {
+      if (carPositionX < 225) {
+        carPositionX += 100;
+        car.style.left = carPositionX + 'px';
+      }
+    });
+
+    // Тўсиқлар
+    function createObstacle() {
+      const obstacle = document.createElement('div');
+      obstacle.classList.add('obstacle');
+      obstacle.style.left = `${Math.floor(Math.random() * 3) * 100 + 25}px`;
+      road.appendChild(obstacle);
+
+      let obstaclePositionY = -100;
+      const obstacleInterval = setInterval(() => {
+        obstaclePositionY += 5;
+        obstacle.style.top = obstaclePositionY + 'px';
+
+        // Тўқнашув текшируви
+        if (
+          obstaclePositionY + 100 >= road.offsetHeight - 120 &&
+          obstaclePositionY <= road.offsetHeight - 20 &&
+          parseInt(obstacle.style.left) === carPositionX
+        ) {
+          alert(`Game Over! Your Score: ${score}`);
+          window.location.reload();
+        }
+
+        // Тўсиқни ўчириш
+        if (obstaclePositionY > road.offsetHeight) {
+          clearInterval(obstacleInterval);
+          road.removeChild(obstacle);
+          score++;
+          scoreElement.textContent = `Score: ${score}`;
+        }
+      }, 20);
+    }
+
+    // Тўсиқларни яратиш
+    setInterval(createObstacle, 1500);
+  </script>
+</body>
+</html>
